@@ -1,4 +1,6 @@
 pkg load optim
+clear ; close all; clc
+
 
   function params = estimate (F, x, y, init)
     [f, p, cvg, iter] = leasqr (x, y, init, F);

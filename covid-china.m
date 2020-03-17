@@ -36,19 +36,27 @@ pkg load optim
  
   p_china = estimate(F,x_china,y_china);
 
-  data_it = load('data/covid-19-data-it.txt');
+%%  data_it = load('data/covid-19-data-it.txt');
+  data_it = load('data/ita2test.csv');
+
   x_it = data_it(:,1);
   y_it = data_it(:,2);
  
   p_it = estimate(F,x_it,y_it);
+  p_it_1d = estimate(F,x_it(1:size(x_it)(1)-1,1),y_it(1:size(y_it)(1)-1,1));
+  p_it_2d = estimate(F,x_it(1:size(x_it)(1)-2,1),y_it(1:size(y_it)(1)-2,1));
+  p_it_3d = estimate(F,x_it(1:size(x_it)(1)-3,1),y_it(1:size(y_it)(1)-3,1));
   
   %%x=[0:100]';
   x=linspace(1,100,200);
   
-  plot(x,F(x,p_china),'linewidth',1,'--m',
-    x_china,y_china,'.b','linewidth',1,
-    x_it,y_it,'or','linewidth',2,
-    x,F(x,p_it),'linewidth',2);
+  plot(x,F(x,p_china),'linewidth',1,'--m'
+    ,x_china,y_china,'.b','linewidth',1
+    ,x_it,y_it,'or','linewidth',2
+    ,x,F(x,p_it),'linewidth',2
+%%    ,x,F(x,p_it_1d),'linewidth',2
+%%    ,x,F(x,p_it_2d),'linewidth',2
+    );
 
  xlabel('Days since January 22, 2020');
  ylabel('Total cases');
