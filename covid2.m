@@ -20,8 +20,8 @@ endfunction
 
 function xdot = sir(x,t)
   N = x(1)+x(2)+x(3);
-  beta = 0.1;
-  gamma = 0;
+  beta = 0.00001582;
+  gamma = 0.00000001;
   
   %% S
   xdot(1) = - (beta * x(2) * x(1)) / N;
@@ -34,8 +34,8 @@ function xdot = sir(x,t)
 endfunction
 
 function xdot = sir2(x,t)
-  beta = 0.1;
-  gamma = 0.8;
+  beta = 6.8958e+04;
+  gamma = 0.5;
   
   %% S
   xdot(1) = - beta * x(2) * x(1);
@@ -48,20 +48,20 @@ function xdot = sir2(x,t)
 endfunction
 
 %%x = lsode ("f", [1; 2], (t = linspace (0, 50, 50)')); plot(t,x);
- x = lsode ("sir2", [100; 3; 0], (t = linspace (0, 3, 200)')); plot(t,x,'linewidth',2);
+ x = lsode ("sir2", [15000; 3; 0], (t = linspace (0, 100, 200)')); plot(t,x,'linewidth',2);
 
 %%  logistica
- %% x(t) = (a e^(a c_1 + b t))/(e^(a c_1 + b t) - 1)
-L = @(x,p) (p(1) * exp(p(1) + p(2) * x))./(exp(p(1) + p(2) * x) - 1);
-init_l=[1.0,1.0];
+I = @(x,p) p(1)./(exp(p(2) * x + p(1)) - 1) + p(1)
+ 
 data_china = load('data/covid-19-data-china.txt');
 x_china = data_china(:,1);
 y_china = data_china(:,2);
+p_china = estimate(I,x_china,y_china,[0.1,0.1]);
 
-F = @(x,p) p(1) + p(2) * exp(p(3) * (x - p(4)))./(1 + exp(p(3) * (x - p(4))));
-F3 = @(x,p) (p(1) * 1) ./ (1 + (p(1)-1) * exp(p(2) * x));
+data_it = load('data/covid-19-data-it.txt');
+x_it = data_it(:,1);
+y_it = data_it(:,2);
+p_it = estimate(I,x_it,y_it,[1,1]);
 
-p_china = estimate(F,x_china,y_china,[0,0,0,0]);
-p_china_2 = estimate(F3,x_china,y_china,[0.1,0.1]);
-
-disp(p_china_2);
+disp(p_china);
+disp(p_it);
