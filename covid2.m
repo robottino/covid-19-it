@@ -1,5 +1,7 @@
 pkg load optim
-clear ; close all; clc
+clear ;
+%%close all;
+clc;
 
 
   function params = estimate (F, x, y, init)
@@ -20,8 +22,11 @@ endfunction
 
 function xdot = sir(x,t)
   N = x(1)+x(2)+x(3);
-  beta = 0.22683/N;
-  gamma = 1000/N;
+  beta = 0.31/N;
+  %%gamma = 5000/N;
+  %%gamma = 0.22683 / 2.5;
+  %%gamma = 0.094262;
+  gamma = 0.086305;
   
   %% S
   xdot(1) = - beta* x(2) * x(1);
@@ -34,7 +39,7 @@ function xdot = sir(x,t)
 endfunction
 
 %%x = lsode ("f", [1; 2], (t = linspace (0, 50, 50)')); plot(t,x);
-t = linspace (0, 100, 200)';
+t = linspace (0, 200, 200)';
  x = lsode ("sir", [66318.20533; 0.22683; 0], t); 
 
 %%  logistica
@@ -56,12 +61,12 @@ y_it = data_it(:,2);
 %%p_it = estimate(I,x_it,y_it,init_I);
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
 
-%%disp(p_china);
-disp(p_it);
 
-plot(x_it,y_it,'linewidth',2,'o',
-  %%t,I(t,p_it),'linewidth',2,
-  t,x(:,2) + x(:,3),
-  t,x);
+plot(
+  x_it,y_it,'linewidth',2,'o'
+  ,t,x(:,2) + x(:,3)
+  ,t,x
+  );
+  legend ({"a","b","c","d","e"}, "location", "east");
  set (gca, "xgrid", "on");
  set (gca, "ygrid", "on");
