@@ -64,9 +64,9 @@ y_it = data_it(:,2);
 
 plot(
   x_it,y_it,'linewidth',2,'o'
-  ,t,x(:,2) + x(:,3)
+  ,t, x(:,2) + x(:,3)
   ,t,x
   );
-  legend ({"a","b","c","d","e"}, "location", "east");
+  legend ({"Total cases Italy","x","Susceptible","Infected","Recovered"}, "location", "east");
  set (gca, "xgrid", "on");
  set (gca, "ygrid", "on");
