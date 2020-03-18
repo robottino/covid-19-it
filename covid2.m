@@ -3,12 +3,6 @@ clear ;
 %%close all;
 clc;
 
-
-  function params = estimate (F, x, y, init)
-    [f, p, cvg, iter] = leasqr (x, y, init, F);
-    params = p;
-  endfunction
-
 function xdot = f (x,t)
   r = 0.25;
   k = 1.4;
@@ -22,11 +16,12 @@ endfunction
 
 function xdot = sir(x,t)
   N = x(1)+x(2)+x(3);
-  beta = 0.31/N;
+  beta = 0.343/N;
   %%gamma = 5000/N;
   %%gamma = 0.22683 / 2.5;
   %%gamma = 0.094262;
-  gamma = 0.086305;
+  %%gamma = 0.086305;
+  gamma = 0.11734;
   
   %% S
   xdot(1) = - beta* x(2) * x(1);
@@ -38,26 +33,38 @@ function xdot = sir(x,t)
   xdot(3) = gamma * x(2);
 endfunction
 
-%%x = lsode ("f", [1; 2], (t = linspace (0, 50, 50)')); plot(t,x);
-t = linspace (0, 200, 200)';
- x = lsode ("sir", [66318.20533; 0.22683; 0], t); 
+function y = delta(x,x0)
+  [x0;x(2:length(x)) - x(1:length(x)-1)]
+endfunction
 
-%%  logistica
-%%I = @(x,p) p(1)./(exp(p(2) * x + p(1)) - 1) + p(1)
-
-%% L / (1+ exp(-k(x-x0))); L=p(1), k=p(2), x0=p(3)
-I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
-
-#{ 
-data_china = load('data/covid-19-data-china.txt');
-x_china = data_china(:,1);
-y_china = data_china(:,2);
-p_china = estimate(I,x_china,y_china,init);
+data = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
+#{
+1:  ricoverati_con_sintomi
+2:  terapia_intensiva
+3:  totale_ospedalizzati
+4:  isolamento_domiciliare
+5:  totale_attualmente_positivi
+6:  nuovi_attualmente_positivi
+7:  dimessi_guariti
+8:  deceduti
+9:  totale_casi
+10:  tamponi
 #}
 
+%% estimate gamma
+recovered=data(:,7);
+infected=data(:,5);
+gamma=(infected' * recovered) * pinv(infected' * infected)
+
+
+
+t = linspace (0, 200, 200)';
+x = lsode ("sir", [66318.20533; 0.22683; 0], t); 
+I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
+
 data_it = load('data/covid-19-data-it.txt');
-x_it = data_it(:,1);
-y_it = data_it(:,2);
+x_it = [1:length(data)]';
+y_it = data(:,9);
 %%p_it = estimate(I,x_it,y_it,init_I);
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
 
