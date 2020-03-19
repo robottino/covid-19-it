@@ -3,6 +3,8 @@ clear ;
 %%close all;
 clc;
 
+global beta gamma;
+
 function xdot = f (x,t)
   r = 0.25;
   k = 1.4;
@@ -15,26 +17,22 @@ function xdot = f (x,t)
 endfunction
 
 function xdot = sir(x,t)
+  global beta gamma;
   N = x(1)+x(2)+x(3);
-  beta = 0.343/N;
-  %%gamma = 5000/N;
-  %%gamma = 0.22683 / 2.5;
-  %%gamma = 0.094262;
-  %%gamma = 0.086305;
-  gamma = 0.11734;
+  b_beta = beta/N;
   
   %% S
-  xdot(1) = - beta* x(2) * x(1);
+  xdot(1) = - b_beta* x(2) * x(1);
 
   %% I
-  xdot(2) = (beta * x(2) * x(1)) - gamma * x(2);
+  xdot(2) = (b_beta * x(2) * x(1)) - gamma * x(2);
 
   %% R
   xdot(3) = gamma * x(2);
 endfunction
 
-function y = delta(x,x0)
-  [x0;x(2:length(x)) - x(1:length(x)-1)]
+function y = ddt(x,x0)
+  y=[x0;x(2:length(x)) - x(1:length(x)-1)];
 endfunction
 
 data = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
@@ -51,29 +49,39 @@ data = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
 10:  tamponi
 #}
 
-%% estimate gamma
-recovered=data(:,7);
-infected=data(:,5);
-gamma=(infected' * recovered) * pinv(infected' * infected)
-
-
-
-t = linspace (0, 200, 200)';
-x = lsode ("sir", [66318.20533; 0.22683; 0], t); 
-I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
-
-data_it = load('data/covid-19-data-it.txt');
+%% guestimate beta (not rigorous)
 x_it = [1:length(data)]';
 y_it = data(:,9);
-%%p_it = estimate(I,x_it,y_it,init_I);
+I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
+beta = p_it(2);
+S0=p_it(1);
 
+%% estimate gamma = (dR/dt) / I
+recovered=data(:,7);
+%%drdt=[0;recovered(2:length(recovered)) - recovered(1:length(recovered)-1)];
+drdt = ddt(recovered,0);
+infected=data(:,5);
+gamma=(infected' * drdt) * pinv(infected' * infected);
+
+%% estimate bets*S = (dI/dt + dR/dt) / I
+didt=data(:,6);
+didrdt=didt+drdt;
+betaS=(infected' * didrdt) * pinv(infected' * infected);
+
+%% estimate dS/dt = -gamma*I -dI/dt 
+dsdt=-gamma * infected -didt;
+
+t = linspace (0, 200, 200)';
+x = lsode ("sir", [S0; 450; 0], t); 
 
 plot(
-  x_it,y_it,'linewidth',2,'o'
-  ,t, x(:,2) + x(:,3)
-  ,t,x
+  t,x
+  %%x_it,y_it,'o'
+  %%,t,I(t,p_it)
+  %%,t, x(:,2) + x(:,3)
   );
-  legend ({"Total cases Italy","x","Susceptible","Infected","Recovered"}, "location", "east");
+  legend ({"Susceptible","Infected","Recovered"}, "location", "east");
  set (gca, "xgrid", "on");
  set (gca, "ygrid", "on");
+ xlabel('Days since february 24, 2020');
