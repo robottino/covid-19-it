@@ -79,19 +79,25 @@ ti_ratio=mean(tins ./ infected);
 %% http://www.salute.gov.it/imgs/C_17_pubblicazioni_1203_ulterioriallegati_ulterioreallegato_10_alleg.pdf
 intense_care_spots = 7981;
 
+start_date = datenum (2020, 2, 24);
+num_days = 100;
 
-t = linspace (0, 100, 200)';
+t = linspace (-8, 98, 200)'; t=t+start_date;
 x = lsode ("sir", [S0; 450; 0], t); 
+current_timestamp=datenum(datevec(date()));
 
 plot(
-  t,x
-  ,t,x(:,2) * ti_ratio
-  ,t,ones(length(t),1)*intense_care_spots
+  t,x,'linewidth',2
+  ,t,x(:,2) * ti_ratio,'linewidth',2
+  ,t,ones(length(t),1)*intense_care_spots,'--','linewidth',1
+  ,current_timestamp,x(:,2)(61),'o','linewidth',2
+  
   %%x_it,y_it,'o'
   %%,t,I(t,p_it)
   %%,t, x(:,2) + x(:,3)
   );
-  legend ({"Susceptible","Infected","Recovered","Intensive care"}, "location", "east");
+  legend ({"Susceptible","Infected","Recovered","Intensive care","Intensive care max capacity","Today"}, "location", "northeast");
  set (gca, "xgrid", "on");
  set (gca, "ygrid", "on");
- xlabel('Days since february 24, 2020');
+ %%xlabel('Days since february 24, 2020');
+ datetick ("x", "dd mmm");
