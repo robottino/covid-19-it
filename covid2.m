@@ -72,16 +72,26 @@ betaS=(infected' * didrdt) * pinv(infected' * infected);
 %% estimate dS/dt = -gamma*I -dI/dt 
 dsdt=-gamma * infected -didt;
 
-t = linspace (0, 200, 200)';
+%% estimate intense therapy / infected ratio
+tins=data(:,2);
+ti_ratio=mean(tins ./ infected);
+
+%% http://www.salute.gov.it/imgs/C_17_pubblicazioni_1203_ulterioriallegati_ulterioreallegato_10_alleg.pdf
+intense_care_spots = 7981;
+
+
+t = linspace (0, 100, 200)';
 x = lsode ("sir", [S0; 450; 0], t); 
 
 plot(
   t,x
+  ,t,x(:,2) * ti_ratio
+  ,t,ones(length(t),1)*intense_care_spots
   %%x_it,y_it,'o'
   %%,t,I(t,p_it)
   %%,t, x(:,2) + x(:,3)
   );
-  legend ({"Susceptible","Infected","Recovered"}, "location", "east");
+  legend ({"Susceptible","Infected","Recovered","Intensive care"}, "location", "east");
  set (gca, "xgrid", "on");
  set (gca, "ygrid", "on");
  xlabel('Days since february 24, 2020');
