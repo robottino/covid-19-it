@@ -83,14 +83,18 @@ start_date = datenum (2020, 2, 24);
 num_days = 100;
 
 t = linspace (-8, 98, 200)'; t=t+start_date;
-x = lsode ("sir", [S0; 450; 0], t); 
+x = lsode ("sir", [S0; 450; 0], t);
+
 current_timestamp=datenum(datevec(date()));
+t2 = linspace (start_date-8, current_timestamp, 2)';
+today_values = lsode ("sir", [S0; 450; 0], t2); 
+today_values=today_values(2:2,1:3);
 
 plot(
   t,x,'linewidth',2
   ,t,x(:,2) * ti_ratio,'linewidth',2
   ,t,ones(length(t),1)*intense_care_spots,'--','linewidth',1
-  ,current_timestamp,x(:,2)(61),'o','linewidth',2
+  ,current_timestamp,today_values(2),'o','linewidth',2
   
   %%x_it,y_it,'o'
   %%,t,I(t,p_it)
