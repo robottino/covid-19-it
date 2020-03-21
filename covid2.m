@@ -35,6 +35,10 @@ function y = ddt(x,x0)
   y=[x0;x(2:length(x)) - x(1:length(x)-1)];
 endfunction
 
+function y = theta(xx,yy,delay)
+  y= ( xx(1:length(xx)-delay)' * yy(1+delay:length(yy)) ) * pinv(xx' * xx);
+endfunction
+
 data = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
 #{
 1:  ricoverati_con_sintomi
