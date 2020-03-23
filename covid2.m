@@ -86,11 +86,11 @@ intense_care_spots = 7981;
 start_date = datenum (2020, 2, 24);
 num_days = 100;
 
-t = linspace (-8, 98, 200)'; t=t+start_date;
+t = linspace (0, 120, 200)'; t=t+start_date;
 x = lsode ("sir", [S0; 450; 0], t);
 
 current_timestamp=datenum(datevec(date()));
-t2 = linspace (start_date-8, current_timestamp, 2)';
+t2 = linspace (start_date, current_timestamp, 2)';
 today_values = lsode ("sir", [S0; 450; 0], t2); 
 today_values=today_values(2:2,1:3);
 
@@ -108,4 +108,5 @@ plot(
  set (gca, "xgrid", "on");
  set (gca, "ygrid", "on");
  %%xlabel('Days since february 24, 2020');
+ %%title('ooo');
  datetick ("x", "dd mmm");
