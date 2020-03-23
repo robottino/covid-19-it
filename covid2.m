@@ -2,6 +2,7 @@ pkg load optim
 clear ;
 %%close all;
 clc;
+more off;
 
 global beta gamma;
 
@@ -53,6 +54,9 @@ data = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
 10:  tamponi
 #}
 
+days_back=0;
+data = data(1:size(data)(1)-days_back,1:size(data)(2));
+
 %% guestimate beta (not rigorous)
 x_it = [1:length(data)]';
 y_it = data(:,9);
@@ -86,7 +90,7 @@ intense_care_spots = 7981;
 start_date = datenum (2020, 2, 24);
 num_days = 100;
 
-t = linspace (0, 120, 200)'; t=t+start_date;
+t = linspace (0, 120, 2000)'; t=t+start_date;
 x = lsode ("sir", [S0; 450; 0], t);
 
 current_timestamp=datenum(datevec(date()));
@@ -94,11 +98,18 @@ t2 = linspace (start_date, current_timestamp, 2)';
 today_values = lsode ("sir", [S0; 450; 0], t2); 
 today_values=today_values(2:2,1:3);
 
+II=[t,[-1000;diff(x(:,2))]];
+[minval, row] = min(min(abs(II),[],2));
+
+strtitle=["Peak: " 10 "infected, @ " datestr(t(row),'dd-mmm-yyyy')];
+
 plot(
   t,x,'linewidth',2
   ,t,x(:,2) * ti_ratio,'linewidth',2
   ,t,ones(length(t),1)*intense_care_spots,'--','linewidth',1
   ,current_timestamp,today_values(2),'o','linewidth',2
+  %%,current_timestamp,x(current_timestamp-start_date:current_timestamp-start_date,2),'x','linewidth',2
+  %%,t(row),x(row:row,2),'x'
   
   %%x_it,y_it,'o'
   %%,t,I(t,p_it)
@@ -107,6 +118,7 @@ plot(
   legend ({"Susceptible","Infected","Recovered","Intensive care","Intensive care max capacity","Today"}, "location", "northeast");
  set (gca, "xgrid", "on");
  set (gca, "ygrid", "on");
- %%xlabel('Days since february 24, 2020');
- %%title('ooo');
+%% strtitle=["Peak: " str(10) "infected, @ " datestr(t(row),'dd-mmm-yyyy')];
+ %%xlabel();
+ title(sprintf("Peak: %d infected @ %s",round(x(row:row,2)),datestr(t(row),'dd-mmm-yyyy')));
  datetick ("x", "dd mmm");
