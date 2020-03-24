@@ -54,6 +54,8 @@ data = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
 10:  tamponi
 #}
 
+%%data(:,9) = data(:,5)+data(:,7)+data(:,8);
+
 days_back=0;
 data = data(1:size(data)(1)-days_back,1:size(data)(2));
 
@@ -73,7 +75,8 @@ infected=data(:,5);
 gamma=(infected' * drdt) * pinv(infected' * infected);
 
 %% estimate bets*S = (dI/dt + dR/dt) / I
-didt=data(:,6);
+%%didt=data(:,6);
+didt=ddt(infected,0);
 didrdt=didt+drdt;
 betaS=(infected' * didrdt) * pinv(infected' * infected);
 
@@ -90,23 +93,23 @@ intense_care_spots = 7981;
 start_date = datenum (2020, 2, 24);
 num_days = 100;
 
-t = linspace (0, 120, 2000)'; t=t+start_date;
+t = linspace (0, 120, 1000)'; t=t+start_date;
 x = lsode ("sir", [S0; 450; 0], t);
 
 current_timestamp=datenum(datevec(date()));
 
 II=[t,[-1000;diff(x(:,2))]];
-[minval, row] = min(min(abs(II),[],2));
-[m,row_today]=min(min([abs(t-current_timestamp)],[],2));
+[m1,row_peak] = min(min(abs(II),[],2));
+[m2,row_today]=min(min([abs(t-current_timestamp)],[],2));
 
 plot(
+%%semilogy(
   t,x,'linewidth',2
   ,t,x(:,2) * ti_ratio,'linewidth',2
   ,t,ones(length(t),1)*intense_care_spots,'--','linewidth',1
   ,t(row_today),x(row_today:row_today,2),'o','linewidth',2
-  %%,current_timestamp,x(current_timestamp-start_date:current_timestamp-start_date,2),'x','linewidth',2
   
-  %%x_it,y_it,'o'
+  %%,x_it,y_it,'o'
   %%,t,I(t,p_it)
   %%,t, x(:,2) + x(:,3)
   );
@@ -115,5 +118,5 @@ plot(
  set (gca, "ygrid", "on");
 %% strtitle=["Peak: " str(10) "infected, @ " datestr(t(row),'dd-mmm-yyyy')];
  %%xlabel();
- title(sprintf("Peak: %d infected @ %s",round(x(row:row,2)),datestr(t(row),'dd-mmm-yyyy')));
+ title(sprintf("Peak: %d infected @ %s",round(x(row_peak:row_peak,2)),datestr(t(row_peak),'dd-mmm-yyyy')));
  datetick ("x", "dd mmm");
