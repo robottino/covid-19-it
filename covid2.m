@@ -20,7 +20,7 @@ endfunction
 function xdot = sir(x,t)
   global beta gamma;
   N = x(1)+x(2)+x(3);
-  b_beta = beta/N;
+  b_beta = 1 * beta/N;
   
   %% S
   xdot(1) = - b_beta* x(2) * x(1);
@@ -94,22 +94,17 @@ t = linspace (0, 120, 2000)'; t=t+start_date;
 x = lsode ("sir", [S0; 450; 0], t);
 
 current_timestamp=datenum(datevec(date()));
-t2 = linspace (start_date, current_timestamp, 2)';
-today_values = lsode ("sir", [S0; 450; 0], t2); 
-today_values=today_values(2:2,1:3);
 
 II=[t,[-1000;diff(x(:,2))]];
 [minval, row] = min(min(abs(II),[],2));
-
-strtitle=["Peak: " 10 "infected, @ " datestr(t(row),'dd-mmm-yyyy')];
+[m,row_today]=min(min([abs(t-current_timestamp)],[],2));
 
 plot(
   t,x,'linewidth',2
   ,t,x(:,2) * ti_ratio,'linewidth',2
   ,t,ones(length(t),1)*intense_care_spots,'--','linewidth',1
-  ,current_timestamp,today_values(2),'o','linewidth',2
+  ,t(row_today),x(row_today:row_today,2),'o','linewidth',2
   %%,current_timestamp,x(current_timestamp-start_date:current_timestamp-start_date,2),'x','linewidth',2
-  %%,t(row),x(row:row,2),'x'
   
   %%x_it,y_it,'o'
   %%,t,I(t,p_it)
