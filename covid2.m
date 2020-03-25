@@ -63,6 +63,7 @@ data = data(1:size(data)(1)-days_back,1:size(data)(2));
 x_it = [1:length(data)]';
 y_it = data(:,9);
 I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
+%%I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0,0];
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
 beta = p_it(2);
 S0=p_it(1);
