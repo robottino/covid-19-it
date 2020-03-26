@@ -62,24 +62,27 @@ data = data(1:size(data)(1)-days_back,1:size(data)(2));
 %% guestimate beta (not rigorous)
 x_it = [1:length(data)]';
 y_it = data(:,9);
-I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
-%%I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0,0];
+%%I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
+I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0,0];
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
 beta = p_it(2);
 S0=p_it(1);
 
 %% estimate gamma = (dR/dt) / I
-recovered=data(:,7);
+%% in SIR model, deaths are considered in the "R" state.
+only_recovered=data(:,7);
+deaths=data(:,8);
+recovered=only_recovered+deaths;
 %%drdt=[0;recovered(2:length(recovered)) - recovered(1:length(recovered)-1)];
 drdt = ddt(recovered,0);
 infected=data(:,5);
-gamma=(infected' * drdt) * pinv(infected' * infected);
+gamma=theta(infected,drdt,0);
 
 %% estimate bets*S = (dI/dt + dR/dt) / I
 %%didt=data(:,6);
 didt=ddt(infected,0);
 didrdt=didt+drdt;
-betaS=(infected' * didrdt) * pinv(infected' * infected);
+betaS=theta(infected,didrdt,0);
 
 %% estimate dS/dt = -gamma*I -dI/dt 
 dsdt=-gamma * infected -didt;
