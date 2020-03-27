@@ -4,7 +4,7 @@ clear ;
 clc;
 more off;
 
-global beta gamma;
+global beta gamma start_date;
 
 function xdot = f (x,t)
   r = 0.25;
@@ -18,9 +18,10 @@ function xdot = f (x,t)
 endfunction
 
 function xdot = sir(x,t)
-  global beta gamma;
+  global beta gamma start_date;
   N = x(1)+x(2)+x(3);
   b_beta = 1 * beta/N;
+  %%if (t - start_date>30) b_beta = b_beta * 0.7; endif
   
   %% S
   xdot(1) = - b_beta* x(2) * x(1);
