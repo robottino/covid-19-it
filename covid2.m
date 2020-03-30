@@ -99,7 +99,7 @@ intense_care_spots = 7981;
 start_date = datenum (2020, 2, 24);
 num_days = 100;
 
-t = linspace (0, 120, 1000)'; t=t+start_date;
+t = linspace (0, 220, 1000)'; t=t+start_date;
 x = lsode ("sir", [S0; 450; 0], t);
 
 current_timestamp=datenum(datevec(date()));
