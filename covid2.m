@@ -41,7 +41,7 @@ function y = theta(xx,yy,delay)
   y= ( xx(1:length(xx)-delay)' * yy(1+delay:length(yy)) ) * pinv(xx' * xx);
 endfunction
 
-data = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
+data_orig = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
 #{
 1:  ricoverati_con_sintomi
 2:  terapia_intensiva
@@ -58,13 +58,14 @@ data = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
 %%data(:,9) = data(:,5)+data(:,7)+data(:,8);
 
 days_back=0;
-data = data(1:size(data)(1)-days_back,1:size(data)(2));
+%%data = data_orig(1:size(data_orig)(1)-days_back,1:size(data_orig)(2));
+data = data_orig(1:end-days_back,1:end);
 
 %% guestimate beta (not rigorous)
 x_it = [1:length(data)]';
 y_it = data(:,9);
 %%I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
-I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0,0];
+I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0.1,10,0];
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
 beta = p_it(2);
 S0=p_it(1);
