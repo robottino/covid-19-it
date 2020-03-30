@@ -37,8 +37,8 @@ function y = ddt(x,x0)
   y=[x0;x(2:length(x)) - x(1:length(x)-1)];
 endfunction
 
-function y = theta(xx,yy,delay)
-  y= ( xx(1:length(xx)-delay)' * yy(1+delay:length(yy)) ) * pinv(xx' * xx);
+function y = theta(X,yy)
+  y= (pinv(X'*X))*X'*yy;
 endfunction
 
 data_orig = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
@@ -72,19 +72,19 @@ S0=p_it(1);
 
 %% estimate gamma = (dR/dt) / I
 %% in SIR model, deaths are considered in the "R" state.
-only_recovered=data(:,7);
+recovered=data(:,7);
 deaths=data(:,8);
-recovered=only_recovered+deaths;
-%%drdt=[0;recovered(2:length(recovered)) - recovered(1:length(recovered)-1)];
-drdt = ddt(recovered,0);
+removed=recovered+deaths;
+%%drdt=[0;removed(2:length(removed)) - removed(1:length(removed)-1)];
+drdt = ddt(removed,0);
 infected=data(:,5);
-gamma=theta(infected,drdt,0);
+gamma=theta(infected,drdt);
 
 %% estimate bets*S = (dI/dt + dR/dt) / I
 %%didt=data(:,6);
 didt=ddt(infected,0);
 didrdt=didt+drdt;
-betaS=theta(infected,didrdt,0);
+betaS=theta(infected,didrdt);
 
 %% estimate dS/dt = -gamma*I -dI/dt 
 dsdt=-gamma * infected -didt;
@@ -119,7 +119,7 @@ plot(
   %%,t,I(t,p_it)
   %%,t, x(:,2) + x(:,3)
   );
-  legend ({"Susceptible","Infected","Recovered","Intensive care","Intensive care max capacity","Today"}, "location", "northeast");
+  legend ({"Susceptible","Infected","Removed (recovered+deaths)","Intensive care","Intensive care max capacity","Today"}, "location", "northeast");
  set (gca, "xgrid", "on");
  set (gca, "ygrid", "on");
 %% strtitle=["Peak: " str(10) "infected, @ " datestr(t(row),'dd-mmm-yyyy')];
