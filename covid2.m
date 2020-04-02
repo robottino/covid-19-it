@@ -41,6 +41,10 @@ function y = theta(X,yy)
   y= (pinv(X'*X))*X'*yy;
 endfunction
 
+function y = mm(x,w)
+  y=filter(ones(w,1)/w, 1, x);
+endfunction
+
 data_orig = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
 #{
 1 ricoverati_con_sintomi
