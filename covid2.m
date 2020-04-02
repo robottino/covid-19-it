@@ -43,19 +43,19 @@ endfunction
 
 data_orig = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
 #{
-1:  ricoverati_con_sintomi
-2:  terapia_intensiva
-3:  totale_ospedalizzati
-4:  isolamento_domiciliare
-5:  totale_attualmente_positivi
-6:  nuovi_attualmente_positivi
-7:  dimessi_guariti
-8:  deceduti
-9:  totale_casi
-10:  tamponi
-#}
+1 ricoverati_con_sintomi
+2 terapia_intensiva
+3 totale_ospedalizzati
+4 isolamento_domiciliare
+5 totale_positivi
+6 variazione_totale_positivi
+7 nuovi_positivi
+8 dimessi_guariti
+9 deceduti
+10 totale_casi
+11 tamponi
 
-%%data(:,9) = data(:,5)+data(:,7)+data(:,8);
+#}
 
 days_back=0;
 %%data = data_orig(1:size(data_orig)(1)-days_back,1:size(data_orig)(2));
@@ -63,7 +63,7 @@ data = data_orig(1:end-days_back,1:end);
 
 %% guestimate beta (not rigorous)
 x_it = [1:length(data)]';
-y_it = data(:,9);
+y_it = data(:,10);
 %%I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
 I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0.1,10,0];
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
@@ -72,8 +72,8 @@ S0=p_it(1);
 
 %% estimate gamma = (dR/dt) / I
 %% in SIR model, deaths are considered in the "R" state.
-recovered=data(:,7);
-deaths=data(:,8);
+recovered=data(:,8);
+deaths=data(:,9);
 removed=recovered+deaths;
 %%drdt=[0;removed(2:length(removed)) - removed(1:length(removed)-1)];
 drdt = ddt(removed,0);
@@ -81,7 +81,6 @@ infected=data(:,5);
 gamma=theta(infected,drdt);
 
 %% estimate bets*S = (dI/dt + dR/dt) / I
-%%didt=data(:,6);
 didt=ddt(infected,0);
 didrdt=didt+drdt;
 betaS=theta(infected,didrdt);
@@ -108,6 +107,7 @@ II=[t,[-1000;diff(x(:,2))]];
 [m1,row_peak] = min(min(abs(II),[],2));
 [m2,row_today]=min(min([abs(t-current_timestamp)],[],2));
 
+figure(1);
 plot(
 %%semilogy(
   t,x,'linewidth',2
@@ -126,3 +126,14 @@ plot(
  %%xlabel();
  title(sprintf("Peak: %d infected @ %s",round(x(row_peak:row_peak,2)),datestr(t(row_peak),'dd-mmm-yyyy')));
  datetick ("x", "dd mmm");
+
+figure(2);
+  tt = [1:length(drdt)]+start_date;
+  delta = drdt-didt;
+  w=3; deltamm=filter(ones(w,1)/w, 1, delta);
+  bar(tt,[delta, deltamm]);
+  legend ({"#Removed - #Infected","#Removed - #Infected (moving average)"}, "location", "northwest");
+  datetick ("x", "dd mmm");
+  set (gca, "xgrid", "on");
+  set (gca, "ygrid", "on");
+ 
