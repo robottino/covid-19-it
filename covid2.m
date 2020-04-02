@@ -137,3 +137,14 @@ figure(2);
   set (gca, "xgrid", "on");
   set (gca, "ygrid", "on");
  
+figure(3);
+plot(
+%%semilogy(
+  %%t,ddt(x(:,2),0)
+  x_it,filter(ones(3,1)/3, 1, didt)
+  );
+  legend ({"Susceptible","Infected","Removed (recovered+deaths)","Intensive care","Intensive care max capacity","Today"}, "location", "northeast");
+ set (gca, "xgrid", "on");
+ set (gca, "ygrid", "on");
+ datetick ("x", "dd mmm");
+ 
