@@ -84,20 +84,14 @@ drdt = ddt(removed,0);
 infected=data(:,5);
 gamma=theta(infected,drdt);
 
-%% estimate bets*S = (dI/dt + dR/dt) / I
-didt=ddt(infected,0);
-didrdt=didt+drdt;
-betaS=theta(infected,didrdt);
-
-%% estimate dS/dt = -gamma*I -dI/dt 
-dsdt=-gamma * infected -didt;
+didt=data(:,7);
 
 %% estimate intense therapy / infected ratio
 tins=data(:,2);
 ti_ratio=mean(tins ./ infected);
 
-%% http://www.salute.gov.it/imgs/C_17_pubblicazioni_1203_ulterioriallegati_ulterioreallegato_10_alleg.pdf
-intense_care_spots = 7981;
+%%https://www.truenumbers.it/coronavirus-terapia-intensiva/
+intense_care_spots = 6864;
 
 start_date = datenum (2020, 2, 24);
 num_days = 100;
