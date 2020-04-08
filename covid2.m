@@ -146,3 +146,9 @@ plot(
  set (gca, "ygrid", "on");
  datetick ("x", "dd mmm");
  
+figure(4);
+ status = [didt,-ddt(recovered,0),-ddt(deaths,0),-drdt,didt-drdt]
+ plot([1:length(didt)],status);
+ legend ({"new infected","new recovered","new deaths","new removed","delta"}, "location", "northeast");
+
+ 
