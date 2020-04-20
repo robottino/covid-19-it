@@ -73,7 +73,6 @@ I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0.1,10,0];
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
 beta = p_it(2);
 S0=p_it(1);
-%%beta=1/5;
 
 %% estimate gamma = (dR/dt) / I
 %% in SIR model, deaths are considered in the "R" state.
@@ -84,7 +83,6 @@ removed=recovered+deaths;
 drdt = ddt(removed,0);
 infected=data(:,5);
 gamma=theta(infected,drdt);
-%%gamma=1/40;
 
 didt=data(:,7);
 
@@ -116,7 +114,7 @@ plot(
   ,t,ones(length(t),1)*intense_care_spots,'--','linewidth',1
   ,t(row_today),x(row_today:row_today,2),'o','linewidth',2
   
-  ,x_it+start_date,removed,'o'
+  ,x_it+start_date,infected,'o'
   %%,x_it,y_it,'o'
   %%,t,I(t,p_it)
   %%,t, x(:,2) + x(:,3)
