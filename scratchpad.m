@@ -26,32 +26,33 @@ function f = gsqm(v,w)
   l=length(v);
   res=[];
   for i= 0:l-1
-    vs = v(1:end-i);
-    ws = w(i+1:end);
+%    vs = v(1:end-i);
+%    ws = w(i+1:end);
+    vs = [v(1:end-i);zeros(i,1)];
+    ws = [zeros(i,1);w(i+1:end)];
     res = [res,mean((ws-vs).^2)];
   endfor
   f = res;
 endfunction
-mminterval=5;
+mminterval=1;
 %%y=mm(drrdt./recovered,mminterval);
 x=mm(didt,mminterval);
 %%y=mm(drrdt,mminterval);
 y=mm(dddt,mminterval);
-bar (gsqm(x,y))
+%bar (gsqm(x,y))
+bar(xcorr(x,y))
 
-
-sqm = @(x,y,i) mean((x(1:end-i)-y(i+1:end)).^2)
-limit=length(didt);
-x=[1:limit];
-vcorr = []; for i = 0:limit-2
-  vcorr = [vcorr,sqm(dddt,didt,i)];
-endfor
-
-bar(vcorr);
-%%plot(x,vcorr,'o');
-
-
-drrdt=ddt(recovered,0);
-bar([drdt,dddt])
 
 %%---------------------------------
+
+pkg load signal;
+drrdt=ddt(recovered,0);
+dddt=ddt(deaths,0);
+
+mminterval=5;
+x=mm(drdt,mminterval);
+y=mm(didt,mminterval);
+
+[r,l]= xcorr(x,y,'unbiased');
+plot(l,r);
+
