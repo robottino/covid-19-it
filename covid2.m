@@ -181,12 +181,14 @@ options = [minstep, maxstep];
 [f,p,c,i]=leasqr (x_inf, y_inf, init_inf, INF, 0.00000001,10000, ones (size (y_inf)) ,0.001 * ones (size (init_inf)), 'dfdp',options);
 
 start_date = datenum (2020, 2, 24);
-t_inf=linspace(0,200,100);
+t_inf=linspace(0,250,200);
 figure(5);
 plot(x_inf+start_date,y_inf,'.',t_inf+start_date,INF(t_inf,p));
 set (gca, "xgrid", "on");
 set (gca, "ygrid", "on");
-datetick ("x", "dd mmm");
+set (gca, "xminorgrid", "on");
+set (gca, "yminorgrid", "on");
+datetick ("x", "dd mmm","keeplimits");
 
   
  
