@@ -49,10 +49,35 @@ pkg load signal;
 drrdt=ddt(recovered,0);
 dddt=ddt(deaths,0);
 
-mminterval=5;
-x=mm(drdt,mminterval);
+mminterval=1;
+x=mm(didt,mminterval);
 y=mm(didt,mminterval);
 
 [r,l]= xcorr(x,y,'unbiased');
 plot(l,r);
+
+%%---------------------------------
+
+clc;
+F = @(x,p) (p(1) ./ (1+exp(-p(2).*(x-p(3))))) - (p(1) ./ (1+exp(-p(4).*(x-p(5)))));
+init= [180000,1/12,35,1/20,83];
+
+x=[1:length(infected)]';
+y=infected;
+
+minstep = 0.00000001*ones(length(init),1);
+maxstep = 0.0001*ones(length(init),1);
+options = [minstep, maxstep];
+
+[f,p,c,i]=leasqr (x, y, init, F, 0.00000001,10000, ones (size (y)) ,0.001 * ones (size (init)), 'dfdp',options);
+
+start_date = datenum (2020, 2, 24);
+t=linspace(0,200,100);
+plot(x+start_date,y,'.',t+start_date,F(t,p));
+set (gca, "xgrid", "on");
+set (gca, "ygrid", "on");
+datetick ("x", "dd mmm");
+
+
+
 
