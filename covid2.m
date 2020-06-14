@@ -5,6 +5,7 @@ clc;
 more off;
 
 %data fase 2: 4/5/2020
+% gilet arancioni: 30/5/2020
 
 global beta gamma start_date;
 
@@ -68,6 +69,7 @@ days_back=0;
 data = data_orig(1:end-days_back,1:end);
 
 tamponi=data(:,11);
+dtdt=ddt(tamponi,0);
 
 %% guestimate beta (not rigorous)
 x_it = [1:length(data)]';
@@ -78,8 +80,8 @@ I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0.1,10,0];
 beta = p_it(2);
 S0=p_it(1);
 beta=1/9;
-beta=1.1616e-01;
-S0=2.0e+05;
+beta=1.3848e-01;
+S0=2.*1.2010e+05;
 %S0=1.4968e+05*2;
 
 %% estimate gamma = (dR/dt) / I
@@ -91,7 +93,7 @@ removed=recovered+deaths;
 drdt = ddt(removed,0);
 infected=data(:,5);
 gamma=theta(infected,drdt);
-gamma=1/52;
+gamma=1/3.1824e+01;
 %gamma=3.5638e-02;
 
 didt=data(:,7);
@@ -108,7 +110,7 @@ start_date = datenum (2020, 2, 24);
 num_days = 100;
 
 t = linspace (0, 220, 1000)'; t=t+start_date;
-x = lsode ("sir", [S0; 1000; 0], t);
+x = lsode ("sir", [S0; 4000; 0], t);
 
 current_timestamp=datenum(datevec(date()));
 
@@ -153,7 +155,7 @@ plot(
 %%semilogy(
   %%t,ddt(x(:,2),0)
   %x_it,filter(ones(3,1)/3, 1, didt)
-  x_it, mm(didt,5)
+  x_it, mm(didt,7)
   );
   legend ({"Susceptible","Infected","Removed (recovered+deaths)","Intensive care","Intensive care max capacity","Today"}, "location", "northeast");
  set (gca, "xgrid", "on");
@@ -162,23 +164,29 @@ plot(
  
 figure(4);
  
- status = [didt,-ddt(recovered,0),-ddt(deaths,0),-drdt,didt-drdt]
+ status = [didt,-ddt(recovered,0),-ddt(deaths,0),-drdt,didt-drdt,dtdt]
  plot([1:length(didt)],status);
  legend ({"new infected","new recovered","new deaths","new removed","delta"}, "location", "northeast");
 
 %------------ Figura stima infetti
 
 INF = @(x,p) (p(1) ./ (1+exp(-p(2).*(x-p(3))))) - (p(1) ./ (1+exp(-p(4).*(x-p(5)))));
+dINF = @(x, f, p, dp, func) p(1) .* ((p(2) .* exp(p(2) .* (p(3) + x)))./(exp(p(2) .* p(3)) + exp(p(2) .* x)).^2 - (p(4) .* exp(p(4) .* (p(5) + x)))./(exp(p(4) .* p(5)) + exp(p(4) .* x)).^2);
+
 init_inf= [180000,1/12,35,1/20,83];
 
 x_inf=[1:length(infected)]';
 y_inf=infected;
 
+weights=ones (size(y_inf));
+%weights=[1:length(y_inf)]';
+
 minstep = 0.00000001*ones(length(init_inf),1);
 maxstep = 0.0001*ones(length(init_inf),1);
 options = [minstep, maxstep];
 
-[f,p,c,i]=leasqr (x_inf, y_inf, init_inf, INF, 0.00000001,10000, ones (size (y_inf)) ,0.001 * ones (size (init_inf)), 'dfdp',options);
+%[f,p,c,i]=leasqr (x_inf, y_inf, init_inf, INF, 0.00000001,10000, ones (size (y_inf)) ,0.001 * ones (size (init_inf)), 'dfdp',options);
+[f,p,c,i]=leasqr (x_inf, y_inf, init_inf, INF, 0.00000001,10000, weights ,0.001 * ones (size (init_inf)), 'dfdp' ,options);
 
 start_date = datenum (2020, 2, 24);
 t_inf=linspace(0,250,200);
@@ -190,9 +198,6 @@ set (gca, "xminorgrid", "on");
 set (gca, "yminorgrid", "on");
 datetick ("x", "dd mmm","keeplimits");
 
-  
- 
- 
  
  
  

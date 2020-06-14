@@ -50,8 +50,8 @@ drrdt=ddt(recovered,0);
 dddt=ddt(deaths,0);
 
 mminterval=1;
-x=mm(didt,mminterval);
-y=mm(didt,mminterval);
+x=mm(tamponi,mminterval);
+y=mm(tamponi,mminterval);
 
 [r,l]= xcorr(x,y,'unbiased');
 plot(l,r);
