@@ -50,17 +50,21 @@ endfunction
 
 data_orig = dlmread("data/dpc-covid19-ita-andamento-nazionale.csv", ',');
 #{
-1 ricoverati_con_sintomi
-2 terapia_intensiva
-3 totale_ospedalizzati
-4 isolamento_domiciliare
-5 totale_positivi
-6 variazione_totale_positivi
-7 nuovi_positivi
-8 dimessi_guariti
-9 deceduti
-10 totale_casi
-11 tamponi
+
+1:ricoverati_con_sintomi
+2:terapia_intensiva
+3:totale_ospedalizzati
+4:isolamento_domiciliare
+5:totale_positivi
+6:variazione_totale_positivi
+7:nuovi_positivi
+8:dimessi_guariti
+9:deceduti
+10:casi_da_sospetto_diagnostico
+11:casi_da_screening
+12:totale_casi
+13:tamponi
+14:casi_testati
 
 #}
 
@@ -68,12 +72,12 @@ days_back=0;
 %%data = data_orig(1:size(data_orig)(1)-days_back,1:size(data_orig)(2));
 data = data_orig(1:end-days_back,1:end);
 
-tamponi=data(:,11);
+tamponi=data(:,13);
 dtdt=ddt(tamponi,0);
 
 %% guestimate beta (not rigorous)
 x_it = [1:length(data)]';
-y_it = data(:,10);
+y_it = :,12);
 %%I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
 I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0.1,10,0];
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
@@ -155,7 +159,7 @@ plot(
 %%semilogy(
   %%t,ddt(x(:,2),0)
   %x_it,filter(ones(3,1)/3, 1, didt)
-  x_it, mm(didt,7)
+  x_it+start_date, mm(didt,7)
   );
   legend ({"Susceptible","Infected","Removed (recovered+deaths)","Intensive care","Intensive care max capacity","Today"}, "location", "northeast");
  set (gca, "xgrid", "on");
