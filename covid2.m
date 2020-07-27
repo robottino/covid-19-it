@@ -77,7 +77,7 @@ dtdt=ddt(tamponi,0);
 
 %% guestimate beta (not rigorous)
 x_it = [1:length(data)]';
-y_it = :,12);
+y_it = data(:,12);
 %%I = @(x,p) p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0,0];
 I = @(x,p) p(4) + p(1) ./ (1+exp(-p(2)*(x-p(3)))); init_I=[0,0.1,10,0];
 [f_it, p_it, cvg_it, iter_it] = leasqr (x_it, y_it, init_I, I);
