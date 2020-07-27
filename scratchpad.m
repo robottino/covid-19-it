@@ -50,8 +50,8 @@ drrdt=ddt(recovered,0);
 dddt=ddt(deaths,0);
 
 mminterval=1;
-x=mm(dtdt,mminterval);
-y=mm(dtdt,mminterval);
+x=mm(didt,mminterval);
+y=mm(dddt,mminterval);
 
 [r,l]= xcorr(x,y,'unbiased');
 plot(l,r);
