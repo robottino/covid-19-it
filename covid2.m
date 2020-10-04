@@ -168,7 +168,8 @@ plot(
  
 figure(4);
  
- status = [didt,-ddt(recovered,0),-ddt(deaths,0),-drdt,didt-drdt,dtdt]
+ format short g;
+ status = [didt,-ddt(recovered,0),-ddt(deaths,0),-drdt,didt-drdt,dtdt, didt./dtdt.*1000]
  plot([1:length(didt)],status);
  legend ({"new infected","new recovered","new deaths","new removed","delta"}, "location", "northeast");
 
