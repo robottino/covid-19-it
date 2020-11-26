@@ -145,15 +145,18 @@ plot(
  datetick ("x", "dd mmm");
 
 figure(2);
-  tt = [1:length(drdt)]+start_date;
-  delta = drdt-didt;
-  deltamm=mm(delta,5);
-  bar(tt,[delta, deltamm]);
-  legend ({"#Removed - #Infected","#Removed - #Infected (moving average)"}, "location", "northwest");
-  datetick ("x", "dd mmm");
+  didtperc=didt./dtdt;
+  start_date = datenum (2020, 2, 24);
+  t=[1:length(didtperc)];
+  v=mm(didtperc,7);
+  plot(t+start_date,v,'.');
   set (gca, "xgrid", "on");
   set (gca, "ygrid", "on");
- 
+  set (gca, "xminorgrid", "on");
+  set (gca, "yminorgrid", "on");
+  datetick ("x", "dd mmm","keeplimits");
+
+  
 figure(3);
 plot(
 %%semilogy(
@@ -169,9 +172,9 @@ plot(
 figure(4);
  
  format short g;
- status = [didt,-ddt(recovered,0),-ddt(deaths,0),-drdt,didt-drdt,dtdt, didt./dtdt.*1000]
+ status = [didt,-ddt(recovered,0),-ddt(deaths,0),-drdt,didt-drdt,dtdt, didt./dtdt.*100]
  plot([1:length(didt)],status);
- legend ({"new infected","new recovered","new deaths","new removed","delta"}, "location", "northeast");
+ legend ({"new infected","new recovered","new deaths","new removed","delta","new tests","% tests"}, "location", "northeast");
 
 %------------ Figura stima infetti
 

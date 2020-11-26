@@ -48,10 +48,15 @@ bar(xcorr(x,y))
 pkg load signal;
 drrdt=ddt(recovered,0);
 dddt=ddt(deaths,0);
+didtperc=didt./dtdt;
 
+%%xraw=didtperc(2:length(didtperc));
+xraw=didt;
+yraw=xraw;
 mminterval=1;
-x=mm(didt,mminterval);
-y=mm(dddt,mminterval);
+
+x=mm(xraw,mminterval);
+y=mm(yraw,mminterval);
 
 [r,l]= xcorr(x,y,'unbiased');
 plot(l,r);
@@ -78,6 +83,24 @@ set (gca, "xgrid", "on");
 set (gca, "ygrid", "on");
 datetick ("x", "dd mmm");
 
+%%---------------------------------
+interval=90;
+didt_last=didt(end-interval:end);
+dtdt_last=dtdt(end-interval:end);
 
+%%---------------------------------
 
+didtperc=didt./dtdt;
+start_date = datenum (2020, 2, 24);
+t=[1:length(didtperc)];
+v=mm(didtperc,7);
+%%figure(5);
+plot(t+start_date,v,'.');
+set (gca, "xgrid", "on");
+set (gca, "ygrid", "on");
+set (gca, "xminorgrid", "on");
+set (gca, "yminorgrid", "on");
+datetick ("x", "dd mmm","keeplimits");
 
+ 
+ 
