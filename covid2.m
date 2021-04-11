@@ -193,6 +193,8 @@ minstep = 0.00000001*ones(length(init_inf),1);
 maxstep = 0.0001*ones(length(init_inf),1);
 options = [minstep, maxstep];
 
+#{
+
 %[f,p,c,i]=leasqr (x_inf, y_inf, init_inf, INF, 0.00000001,10000, ones (size (y_inf)) ,0.001 * ones (size (init_inf)), 'dfdp',options);
 [f,p,c,i]=leasqr (x_inf, y_inf, init_inf, INF, 0.00000001,10000, weights ,0.001 * ones (size (init_inf)), 'dfdp' ,options);
 
@@ -206,7 +208,7 @@ set (gca, "xminorgrid", "on");
 set (gca, "yminorgrid", "on");
 datetick ("x", "dd mmm","keeplimits");
 
- 
+#} 
  
  
  
